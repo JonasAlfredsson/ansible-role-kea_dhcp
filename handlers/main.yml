@@ -1,0 +1,3 @@
+- name: "Reload Kea Control Agent"
+  command: "docker kill --signal=HUP {{ kea_ctrl_agent_container_name }}"
+  when: kea_ctrl_agent_enabled

@@ -1,0 +1,46 @@
+{
+    "Dhcp6": {
+        "interfaces-config": {
+            "interfaces": {{ kea_dhcp6_interfaces | to_nice_json(indent=4, ensure_ascii=False ) | indent(12, False) }}
+        },
+
+{% if kea_ctrl_agent_enabled %}
+        // Create a socket which the Control Agent may use to communicate.
+        "control-socket": {
+            "socket-type": "unix",
+            "socket-name": "/kea/sockets/dhcp6.socket"
+        },
+
+{% endif %}
+        // Specifies credentials to access lease database.
+        "lease-database": {
+            "type": "memfile",
+            "name": "/kea/leases/dhcp6.csv",
+            "lfc-interval": 3600
+        },
+
+{% if kea_dhcp6_multi_threading_enable %}
+        // Multi-threading options.
+        "multi-threading": {
+            "enable-multi-threading": {{ kea_dhcp6_multi_threading_enable | bool }},
+            "thread-pool-size": {{ kea_dhcp6_multi_threading_pool_size | int }},
+            "packet-queue-size": {{ kea_dhcp6_multi_threading_queue_size | int }}
+        },
+
+{% endif %}
+        // Lease queue and lifetime values.
+        "parked-packet-limit": {{ kea_dhcp6_parked_packet_limit | int }},
+        "valid-lifetime": {{ kea_dhcp6_valid_lifetime | int }},
+        "renew-timer": {{ kea_dhcp6_renew_timer | int }},
+        "rebind-timer": {{ kea_dhcp6_rebind_timer | int }},
+
+{% if kea_dhcp6_raw_options | length > 0 %}
+        {{ kea_dhcp6_raw_options | to_nice_json(indent=4, ensure_ascii=False ) | indent(8, False) }}
+
+{% endif %}
+        // We include the subnet file separately to make this one less cluttered.
+        <?include "/kea/config/subnet6.json"?>
+
+        "loggers": {{ kea_logging_raw_dhcp6 | to_nice_json(indent=4, ensure_ascii=False ) | indent(8, False) }}
+    }
+}

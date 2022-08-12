@@ -1,0 +1,63 @@
+- name: "Create expected folders"
+  file:
+    state: directory
+    path: "{{ item }}"
+    mode: '0775'
+    owner: 'root'
+    group: '101'
+  loop:
+    - "{{ kea_container_base_dir }}"
+    - "{{ kea_container_base_dir }}/config"
+    - "{{ kea_container_base_dir }}/leases"
+    - "{{ kea_container_base_dir }}/logs"
+    - "{{ kea_container_base_dir }}/sockets"
+    - "{{ kea_container_base_dir }}/entrypoint.d"
+
+- name: Deploy the DHCP services
+  include_tasks: deploy_dhcp.yml
+  loop:
+    - container_name: "{{ kea_dhcp4_container_name }}"
+      container_image: "{{ kea_dhcp4_container_image }}"
+      container_command: "{{ kea_dhcp4_container_command }}"
+      dhcp_ip_version: "4"
+      enabled: "{{ kea_dhcp4_enabled | bool }}"
+    - container_name: "{{ kea_dhcp6_container_name }}"
+      container_image: "{{ kea_dhcp6_container_image }}"
+      container_command: "{{ kea_dhcp6_container_command }}"
+      dhcp_ip_version: "6"
+      enabled: "{{ kea_dhcp6_enabled | bool }}"
+  loop_control:
+    loop_var: "outer_item"
+  when: outer_item.enabled
+
+- name: Deploy the Control Agent service
+  block:
+    - name: Copy Control Agent configuration files
+      template:
+        src: "{{ item }}"
+        dest: "{{ kea_container_base_dir }}/config/{{ item | regex_replace('.j2', '') }}"
+        owner: 'root'
+        group: '101'
+        mode: '0664'
+      loop:
+        - "ctrl-agent.json.j2"
+      notify: Reload Kea Control Agent
+
+    - name: Start Kea Control Agent container
+      docker_container:
+        name: "{{ kea_ctrl_agent_container_name }}"
+        image: "{{ kea_ctrl_agent_container_image }}"
+        pull: yes
+        state: started
+        restart_policy: unless-stopped
+        container_default_behavior: compatibility
+        command: "{{ kea_ctrl_agent_container_command }}"
+        volumes:
+          - "{{ kea_container_base_dir }}/config:/kea/config:ro"
+          - "{{ kea_container_base_dir }}/sockets:/kea/sockets"
+        networks_cli_compatible: yes
+        network_mode: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary('host', 'default')}}"
+        networks: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary(omit, kea_ctrl_agent_container_networks) }}"
+        published_ports: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary(omit, kea_ctrl_agent_container_ports) }}"
+        purge_networks: true
+  when: kea_ctrl_agent_enabled

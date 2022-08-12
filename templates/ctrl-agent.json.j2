@@ -1,0 +1,27 @@
+{
+    "Control-agent": {
+        "http-host": "{{ kea_ctrl_agent_host | string }}",
+        "http-port": {{ kea_ctrl_agent_port | int }},
+
+        "control-sockets": {
+{% if kea_dhcp4_enabled %}
+            "dhcp4": {
+                "socket-type": "unix",
+                "socket-name": "/kea/sockets/dhcp4.socket"
+            }{% if kea_dhcp6_enabled %},{% endif %}{{''}}
+{% endif %}
+{% if kea_dhcp6_enabled %}
+            "dhcp6": {
+                "socket-type": "unix",
+                "socket-name": "/kea/sockets/dhcp6.socket"
+            }
+{% endif %}
+        },
+
+{% if kea_ctrl_agent_raw_options | length > 0 %}
+        {{ kea_ctrl_agent_raw_options | to_nice_json(indent=4, ensure_ascii=False ) | indent(8, False) }}
+
+{% endif %}
+        "loggers": {{ kea_logging_raw_ctrl_agent | to_nice_json(indent=4, ensure_ascii=False ) | indent(8, False) }}
+    }
+}

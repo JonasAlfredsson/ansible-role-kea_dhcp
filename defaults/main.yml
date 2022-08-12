@@ -1,0 +1,151 @@
+#
+# Container options
+#
+
+# Kea services that should be enabled
+kea_dhcp4_enabled: true
+kea_dhcp6_enabled: false
+kea_ctrl_agent_enabled: false
+
+# Base directory for all files
+kea_container_base_dir: "/srv/kea"
+
+# The IPv4 DHCP service
+kea_dhcp4_container_name: "kea-dhcp4"
+kea_dhcp4_container_image: "jonasal/kea-dhcp4:2"
+kea_dhcp4_container_command: "-c /kea/config/dhcp4.json"
+
+# The IPv6 DHCP service
+kea_dhcp6_container_name: "kea-dhcp6"
+kea_dhcp6_container_image: "jonasal/kea-dhcp6:2"
+kea_dhcp6_container_command: "-c /kea/config/dhcp6.json"
+
+# The Control Agent service
+kea_ctrl_agent_container_name: "kea-ctrl-agent"
+kea_ctrl_agent_container_image: "jonasal/kea-ctrl-agent:2"
+kea_ctrl_agent_container_command: "-c /kea/config/ctrl-agent.json"
+
+kea_ctrl_agent_container_use_host_network: false
+kea_ctrl_agent_container_networks:
+  - name: bridge
+kea_ctrl_agent_container_ports:
+  - "{{ kea_ctrl_agent_port }}:{{ kea_ctrl_agent_port }}"
+
+
+#
+# DHCP configuration
+#
+
+# Interface
+kea_dhcp_interfaces: [ '*' ]
+kea_dhcp4_interfaces: "{{ kea_dhcp_interfaces }}"
+kea_dhcp6_interfaces: "{{ kea_dhcp_interfaces }}"
+
+# Multi-Threading
+kea_dhcp_multi_threading_enable: false
+kea_dhcp4_multi_threading_enable: "{{ kea_dhcp_multi_threading_enable }}"
+kea_dhcp6_multi_threading_enable: "{{ kea_dhcp_multi_threading_enable }}"
+
+kea_dhcp4_multi_threading_pool_size: 4
+kea_dhcp6_multi_threading_pool_size: 4
+
+kea_dhcp4_multi_threading_queue_size: 28
+kea_dhcp6_multi_threading_queue_size: 600
+
+# Leases
+kea_dhcp_parked_packet_limit: 128
+kea_dhcp4_parked_packet_limit: "{{ kea_dhcp_parked_packet_limit }}"
+kea_dhcp6_parked_packet_limit: "{{ kea_dhcp_parked_packet_limit }}"
+
+kea_dhcp_valid_lifetime: 6000
+kea_dhcp4_valid_lifetime: "{{ kea_dhcp_valid_lifetime }}"
+kea_dhcp6_valid_lifetime: "{{ kea_dhcp_valid_lifetime }}"
+
+kea_dhcp_renew_timer: 900
+kea_dhcp4_renew_timer: "{{ kea_dhcp_renew_timer }}"
+kea_dhcp6_renew_timer: "{{ kea_dhcp_renew_timer }}"
+
+kea_dhcp_rebind_timer: 1000
+kea_dhcp4_rebind_timer: "{{ kea_dhcp_rebind_timer }}"
+kea_dhcp6_rebind_timer: "{{ kea_dhcp_rebind_timer }}"
+
+# Subnets
+kea_dhcp4_subnets: []
+kea_dhcp6_subnets: []
+
+
+
+#
+# Control Agent configuration
+#
+
+kea_ctrl_agent_host: "0.0.0.0"
+kea_ctrl_agent_port: 8000
+
+
+
+#
+# Logging
+#
+
+# Logging configuration can be shared somewhat between the services, so these
+# initial variables will affect all instances unless you change any of the
+# "kea_logging_raw_*" variables.
+#
+# Note the space here----▼    This is to not trip jinja templating with "{%".
+kea_logging_pattern: "%D{ %Y-%m-%d %H:%M:%S.%q } %-5p [%c/%i.%t] %m\n"
+kea_logging_severity: "INFO"
+kea_logging_debuglevel: 0
+kea_logging_maxsize: 10485760  # 10 MB
+kea_logging_maxver: 3
+
+kea_logging_raw_dhcp4:
+  - name: "kea-dhcp4"
+    severity: "{{ kea_logging_severity }}"
+    debuglevel: "{{ kea_logging_debuglevel }}"
+    output_options:
+      - output: "stdout"
+        pattern: "{{ kea_logging_pattern }}"
+      - output: "/kea/logs/dhcp4.log"
+        pattern: "{{ kea_logging_pattern }}"
+        maxsize: "{{ kea_logging_maxsize }}"
+        maxver: "{{ kea_logging_maxver }}"
+
+kea_logging_raw_dhcp6:
+  - name: "kea-dhcp6"
+    severity: "{{ kea_logging_severity }}"
+    debuglevel: "{{ kea_logging_debuglevel }}"
+    output_options:
+      - output: "stdout"
+        pattern: "{{ kea_logging_pattern }}"
+      - output: "/kea/logs/dhcp6.log"
+        pattern: "{{ kea_logging_pattern }}"
+        maxsize: "{{ kea_logging_maxsize }}"
+        maxver: "{{ kea_logging_maxver }}"
+
+kea_logging_raw_ctrl_agent:
+  - name: "kea-ctrl-agent"
+    severity: "{{ kea_logging_severity }}"
+    debuglevel: "{{ kea_logging_debuglevel }}"
+    output_options:
+      - output: "stdout"
+        pattern: "{{ kea_logging_pattern }}"
+      - output: "/kea/logs/ctrl-agent.log"
+        pattern: "{{ kea_logging_pattern }}"
+        maxsize: "{{ kea_logging_maxsize }}"
+        maxver: "{{ kea_logging_maxver }}"
+
+
+
+#
+# Raw settings
+#
+
+# There are a lot more settings available for Kea, so there is no way
+# we can create variables for each and every one of them. To alleviate
+# this somewhat is to include "raw" variables that will just expand to
+# JSON inside the respective configuration file.
+# This works the same as the "kea_logging_raw_*" variables.
+kea_dhcp4_raw_options: {}
+kea_dhcp6_raw_options: {}
+kea_ctrl_agent_raw_options: {}

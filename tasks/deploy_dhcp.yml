@@ -1,0 +1,35 @@
+- name: "Copy Kea DHCP{{ outer_item.dhcp_ip_version }} configuration files"
+  template:
+    src: "{{ item }}"
+    dest: "{{ kea_container_base_dir }}/config/{{ item | regex_replace('.j2', '') }}"
+    owner: 'root'
+    group: '101'
+    mode: '0664'
+  loop:
+    - "dhcp{{ outer_item.dhcp_ip_version }}.json.j2"
+    - "subnet{{ outer_item.dhcp_ip_version }}.json.j2"
+  register: kea_config
+
+- name: "Start Kea DHCP{{ outer_item.dhcp_ip_version }} container"
+  docker_container:
+    name: "{{ outer_item.container_name }}"
+    image: "{{ outer_item.container_image }}"
+    pull: yes
+    state: started
+    restart_policy: unless-stopped
+    container_default_behavior: compatibility
+    command: "{{ outer_item.container_command }}"
+    volumes:
+      - "{{ kea_container_base_dir }}/config:/kea/config:ro"
+      - "{{ kea_container_base_dir }}/leases:/kea/leases"
+      - "{{ kea_container_base_dir }}/logs:/kea/logs"
+      - "{{ kea_container_base_dir }}/sockets:/kea/sockets"
+      - "{{ kea_container_base_dir }}/entrypoint.d:/entrypoint.d:ro"
+    networks_cli_compatible: yes
+    network_mode: host
+    purge_networks: true
+
+- name: "Reload Kea DHCP{{ outer_item.dhcp_ip_version }} configuration"
+  command: "docker kill --signal=HUP {{ outer_item.container_name }}"
+  when: kea_config.changed
+  notify: Reload Kea Control Agent
