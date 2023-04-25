@@ -17,7 +17,6 @@
     pull: yes
     state: started
     restart_policy: unless-stopped
-    container_default_behavior: compatibility
     command: "{{ outer_item.container_command }}"
     volumes:
       - "{{ kea_container_base_dir }}/config:/kea/config:ro"
@@ -25,7 +24,6 @@
       - "{{ kea_container_base_dir }}/logs:/kea/logs"
       - "{{ kea_container_base_dir }}/sockets:/kea/sockets"
       - "{{ kea_container_base_dir }}/entrypoint.d:/entrypoint.d:ro"
-    networks_cli_compatible: yes
     network_mode: host
     purge_networks: true
 

@@ -50,14 +50,13 @@
         pull: yes
         state: started
         restart_policy: unless-stopped
-        container_default_behavior: compatibility
         command: "{{ kea_ctrl_agent_container_command }}"
         volumes:
           - "{{ kea_container_base_dir }}/config:/kea/config:ro"
           - "{{ kea_container_base_dir }}/sockets:/kea/sockets"
-        networks_cli_compatible: yes
-        network_mode: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary('host', 'default')}}"
+        comparisons:
+          networks: strict
+        network_mode: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary('host', omit)}}"
         networks: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary(omit, kea_ctrl_agent_container_networks) }}"
         published_ports: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary(omit, kea_ctrl_agent_container_ports) }}"
-        purge_networks: true
   when: kea_ctrl_agent_enabled
