@@ -37,7 +37,7 @@ kea_ctrl_agent_container_ports:
 #
 
 # Interface
-kea_dhcp_interfaces: [ '*' ]
+kea_dhcp_interfaces: ['*']
 kea_dhcp4_interfaces: "{{ kea_dhcp_interfaces }}"
 kea_dhcp6_interfaces: "{{ kea_dhcp_interfaces }}"
 
@@ -74,14 +74,12 @@ kea_dhcp4_subnets: []
 kea_dhcp6_subnets: []
 
 
-
 #
 # Control Agent configuration
 #
 
 kea_ctrl_agent_host: "0.0.0.0"
 kea_ctrl_agent_port: 8000
-
 
 
 #
@@ -134,7 +132,6 @@ kea_logging_raw_ctrl_agent:
         pattern: "{{ kea_logging_pattern }}"
         maxsize: "{{ kea_logging_maxsize }}"
         maxver: "{{ kea_logging_maxver }}"
-
 
 
 #

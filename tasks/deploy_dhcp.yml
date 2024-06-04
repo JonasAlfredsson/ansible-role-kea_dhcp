@@ -1,5 +1,5 @@
 - name: "Copy Kea DHCP{{ outer_item.dhcp_ip_version }} configuration files"
-  template:
+  ansible.builtin.template:
     src: "{{ item }}"
     dest: "{{ kea_container_base_dir }}/config/{{ item | regex_replace('.j2', '') }}"
     owner: 'root'
@@ -11,10 +11,10 @@
   register: kea_config
 
 - name: "Start Kea DHCP{{ outer_item.dhcp_ip_version }} container"
-  docker_container:
+  community.docker.docker_container:
     name: "{{ outer_item.container_name }}"
     image: "{{ outer_item.container_image }}"
-    pull: yes
+    pull: true
     state: started
     restart_policy: unless-stopped
     command: "{{ outer_item.container_command }}"
@@ -28,6 +28,7 @@
     purge_networks: true
 
 - name: "Reload Kea DHCP{{ outer_item.dhcp_ip_version }} configuration"
-  command: "docker kill --signal=HUP {{ outer_item.container_name }}"
+  ansible.builtin.command: "docker kill --signal=HUP {{ outer_item.container_name }}"
+  changed_when: true
   when: kea_config.changed
   notify: Reload Kea Control Agent

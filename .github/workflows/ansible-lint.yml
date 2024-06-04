@@ -1,0 +1,23 @@
+name: ansible-lint
+
+on:
+  push:
+    branches:
+      - "main"
+      - "master"
+  pull_request:
+    branches:
+      - "main"
+      - "master"
+
+jobs:
+  build:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v24.5.0

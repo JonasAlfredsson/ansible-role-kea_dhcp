@@ -1,5 +1,5 @@
 - name: "Create expected folders"
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ item }}"
     mode: '0775'
@@ -14,7 +14,7 @@
     - "{{ kea_container_base_dir }}/entrypoint.d"
 
 - name: Deploy the DHCP services
-  include_tasks: deploy_dhcp.yml
+  ansible.builtin.include_tasks: deploy_dhcp.yml
   loop:
     - container_name: "{{ kea_dhcp4_container_name }}"
       container_image: "{{ kea_dhcp4_container_image }}"
@@ -31,9 +31,10 @@
   when: outer_item.enabled
 
 - name: Deploy the Control Agent service
+  when: kea_ctrl_agent_enabled
   block:
     - name: Copy Control Agent configuration files
-      template:
+      ansible.builtin.template:
         src: "{{ item }}"
         dest: "{{ kea_container_base_dir }}/config/{{ item | regex_replace('.j2', '') }}"
         owner: 'root'
@@ -44,10 +45,10 @@
       notify: Reload Kea Control Agent
 
     - name: Start Kea Control Agent container
-      docker_container:
+      community.docker.docker_container:
         name: "{{ kea_ctrl_agent_container_name }}"
         image: "{{ kea_ctrl_agent_container_image }}"
-        pull: yes
+        pull: true
         state: started
         restart_policy: unless-stopped
         command: "{{ kea_ctrl_agent_container_command }}"
@@ -56,7 +57,6 @@
           - "{{ kea_container_base_dir }}/sockets:/kea/sockets"
         comparisons:
           networks: strict
-        network_mode: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary('host', omit)}}"
+        network_mode: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary('host', omit) }}"
         networks: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary(omit, kea_ctrl_agent_container_networks) }}"
         published_ports: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary(omit, kea_ctrl_agent_container_ports) }}"
-  when: kea_ctrl_agent_enabled
