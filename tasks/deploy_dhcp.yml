@@ -24,8 +24,9 @@
       - "{{ kea_container_base_dir }}/logs:/kea/logs"
       - "{{ kea_container_base_dir }}/sockets:/kea/sockets"
       - "{{ kea_container_base_dir }}/entrypoint.d:/entrypoint.d:ro"
+    comparisons:
+      networks: strict
     network_mode: host
-    purge_networks: true
 
 - name: "Reload Kea DHCP{{ outer_item.dhcp_ip_version }} configuration"
   ansible.builtin.command: "docker kill --signal=HUP {{ outer_item.container_name }}"
