@@ -117,7 +117,8 @@ with some extra options:
 
 ```yaml
 kea_dhcp4_subnets:
-  - subnet: "192.168.1.0/24"
+  - id: 1
+    subnet: "192.168.1.0/24"
     pools:
       - pool: "192.168.1.100 - 192.168.1.111"
       - pool: "192.168.1.200 - 192.168.1.222"
@@ -126,7 +127,8 @@ kea_dhcp4_subnets:
         ip-address: "192.168.1.98"
       - hw-address: "aa:bb:cc:dd:ee:ff"
         ip-address: "192.168.1.99"
-  - subnet: "192.168.2.0/24"
+  - id: 2
+    subnet: "192.168.2.0/24"
     hostname-char-replacement: "x"
     hostname-char-set: "[^A-Za-z0-9.-]"
     pools:
