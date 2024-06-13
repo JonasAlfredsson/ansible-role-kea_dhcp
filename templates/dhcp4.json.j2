@@ -20,15 +20,15 @@
             "lfc-interval": 3600
         },
 
-{% if kea_dhcp4_multi_threading_enable %}
         // Multi-threading options.
         "multi-threading": {
-            "enable-multi-threading": {{ kea_dhcp4_multi_threading_enable | bool }},
+            "enable-multi-threading": {{ kea_dhcp4_multi_threading_enable | bool | to_json }},
+{% if kea_dhcp4_multi_threading_enable %}
             "thread-pool-size": {{ kea_dhcp4_multi_threading_pool_size | int }},
             "packet-queue-size": {{ kea_dhcp4_multi_threading_queue_size | int }}
+{% endif %}
         },
 
-{% endif %}
         // Lease queue and lifetime values.
         "parked-packet-limit": {{ kea_dhcp4_parked_packet_limit | int }},
         "valid-lifetime": {{ kea_dhcp4_valid_lifetime | int }},
