@@ -35,10 +35,10 @@
         "renew-timer": {{ kea_dhcp4_renew_timer | int }},
         "rebind-timer": {{ kea_dhcp4_rebind_timer | int }},
 
-{% if kea_dhcp4_raw_options | length > 0 %}
-        {{ kea_dhcp4_raw_options | to_nice_json(indent=4, ensure_ascii=False ) | indent(8, False) }}
+{% for key, value in kea_dhcp4_raw_options.items() %}
+        "{{ key }}": {{ value | to_nice_json(indent=4, ensure_ascii=False) | indent(8, False) }},
 
-{% endif %}
+{% endfor %}
         // We include the subnet file separately to make this one less cluttered.
         <?include "/kea/config/subnet4.json"?>
 
