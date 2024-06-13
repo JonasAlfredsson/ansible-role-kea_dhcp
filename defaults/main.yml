@@ -42,15 +42,16 @@ kea_dhcp4_interfaces: "{{ kea_dhcp_interfaces }}"
 kea_dhcp6_interfaces: "{{ kea_dhcp_interfaces }}"
 
 # Multi-Threading
-kea_dhcp_multi_threading_enable: false
+# https://kea.readthedocs.io/en/latest/arm/dhcp4-srv.html#multi-threading-settings-with-different-database-backends
+kea_dhcp_multi_threading_enable: true
 kea_dhcp4_multi_threading_enable: "{{ kea_dhcp_multi_threading_enable }}"
 kea_dhcp6_multi_threading_enable: "{{ kea_dhcp_multi_threading_enable }}"
 
-kea_dhcp4_multi_threading_pool_size: 4
-kea_dhcp6_multi_threading_pool_size: 4
+kea_dhcp4_multi_threading_pool_size: "{{ (ansible_processor_vcpus if ansible_processor_vcpus < 8 else 8) | int }}"
+kea_dhcp6_multi_threading_pool_size: "{{ (ansible_processor_vcpus if ansible_processor_vcpus < 6 else 6) | int }}"
 
-kea_dhcp4_multi_threading_queue_size: 28
-kea_dhcp6_multi_threading_queue_size: 600
+kea_dhcp4_multi_threading_queue_size: "{{ (kea_dhcp4_multi_threading_pool_size|int * 7) | int }}"
+kea_dhcp6_multi_threading_queue_size: "{{ (kea_dhcp6_multi_threading_pool_size|int * 150) | int }}"
 
 # Leases
 kea_dhcp_parked_packet_limit: 128
