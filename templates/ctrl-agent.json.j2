@@ -18,10 +18,10 @@
 {% endif %}
         },
 
-{% if kea_ctrl_agent_raw_options | length > 0 %}
-        {{ kea_ctrl_agent_raw_options | to_nice_json(indent=4, ensure_ascii=False ) | indent(8, False) }}
+{% for key, value in kea_ctrl_agent_raw_options.items() %}
+        "{{ key }}": {{ value | to_nice_json(indent=4, ensure_ascii=False) | indent(8, False) }},
 
-{% endif %}
+{% endfor %}
         "loggers": {{ kea_logging_raw_ctrl_agent | to_nice_json(indent=4, ensure_ascii=False ) | indent(8, False) }}
     }
 }
