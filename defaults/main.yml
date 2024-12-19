@@ -62,11 +62,11 @@ kea_dhcp_valid_lifetime: 6000
 kea_dhcp4_valid_lifetime: "{{ kea_dhcp_valid_lifetime }}"
 kea_dhcp6_valid_lifetime: "{{ kea_dhcp_valid_lifetime }}"
 
-kea_dhcp_renew_timer: 900
+kea_dhcp_renew_timer: "{{ (kea_dhcp_valid_lifetime|float * 0.5) | int }}"
 kea_dhcp4_renew_timer: "{{ kea_dhcp_renew_timer }}"
 kea_dhcp6_renew_timer: "{{ kea_dhcp_renew_timer }}"
 
-kea_dhcp_rebind_timer: 1000
+kea_dhcp_rebind_timer: "{{ (kea_dhcp_valid_lifetime|float * 0.85) | int }}"
 kea_dhcp4_rebind_timer: "{{ kea_dhcp_rebind_timer }}"
 kea_dhcp6_rebind_timer: "{{ kea_dhcp_rebind_timer }}"
 
