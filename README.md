@@ -162,8 +162,8 @@ services. You probably want the same settings across all services, so these
 variables exist to make your life easier:
 
 ```yaml
-# Note the space here----▼
-kea_logging_pattern: "%D{ %Y-%m-%d %H:%M:%S.%q } %-5p [%c/%i.%t] %m\n"
+# NOTE: !unsafe here----▼
+kea_logging_pattern: !unsafe "%D{%Y-%m-%d %H:%M:%S.%q} %-5p [%c/%i.%t] %m\n"
 kea_logging_severity: "INFO"
 kea_logging_debuglevel: 0
 kea_logging_maxsize: 10485760  # 10 MB
@@ -173,10 +173,10 @@ kea_logging_maxver: 3
 Unless you change the `kea_logging_raw_*` variable this will set up logging at
 the INFO level both to `stdout` and to a log file with automatic rotation when
 it reaches 10MB in size and it will keep 2 files in history before they are
-deleted. The only thing to be wary of here is the space in the `{ %` pointed out
-above. This was necessary to do because `{%` is a special command in jinja which
-makes the templating fail. Just be careful with that in case you want to change
-the pattern.
+deleted. The only thing to take note of here is the [`!unsafe`][9] keyword used
+in the `kea_logging_pattern`. This is used to get around Ansible otherwise
+trying to interpret `{%` as a special jinja2 templating command. Just be careful
+to keep that in case you want to change the pattern.
 
 However, like in the [subnet](#subnets) case discussed above we allow you to
 pipe your own custom settings directly to the templating. Take a look in the
@@ -214,3 +214,4 @@ Only the sky and your sanity is the limit here, so go wild and use the
 [6]: https://kea.readthedocs.io/en/latest/arm/logging.html
 [7]: https://github.com/JonasAlfredsson/docker-kea#docker-network-mode
 [8]: https://kea.readthedocs.io/en/latest/arm/intro.html
+[9]: https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_advanced_syntax.html#unsafe-or-raw-strings

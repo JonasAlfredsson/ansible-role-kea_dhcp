@@ -91,8 +91,8 @@ kea_ctrl_agent_port: 8000
 # initial variables will affect all instances unless you change any of the
 # "kea_logging_raw_*" variables.
 #
-# Note the space here----▼    This is to not trip jinja templating with "{%".
-kea_logging_pattern: "%D{ %Y-%m-%d %H:%M:%S.%q } %-5p [%c/%i.%t] %m\n"
+# NOTE: !unsafe here----▼    This is to not trip jinja templating with "{%".
+kea_logging_pattern: !unsafe "%D{%Y-%m-%d %H:%M:%S.%q} %-5p [%c/%i.%t] %m\n"
 kea_logging_severity: "INFO"
 kea_logging_debuglevel: 0
 kea_logging_maxsize: 10485760  # 10 MB
