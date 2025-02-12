@@ -1,0 +1,19 @@
+galaxy_info:
+  author: Jonas Alfredsson
+  description: Ansible role to install and configure Kea DHCP server
+  license: GPL-3.0-or-later
+  min_ansible_version: 2.9
+  platforms:
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
+    - name: CentOS
+      versions:
+        - 7
+        - 8
+  galaxy_tags:
+    - kea
+    - dhcp
+    - isc
+    - network
