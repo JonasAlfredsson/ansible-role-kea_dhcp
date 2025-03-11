@@ -10,7 +10,7 @@ galaxy_info:
       versions:
         - bionic
         - focal
-    - name: CentOS
+    - name: EL
       versions:
         - "7"
         - "8"
