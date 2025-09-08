@@ -13,6 +13,15 @@
     - "{{ kea_container_base_dir }}/sockets"
     - "{{ kea_container_base_dir }}/entrypoint.d"
 
+- name: Set specific permissions for sockets directory
+  ansible.builtin.file:
+    state: directory
+    mode: '0750'
+    owner: 'root'
+    group: '101'
+    recurse: true
+    path: "{{ kea_container_base_dir }}/sockets"
+
 - name: Deploy the DHCP services
   ansible.builtin.include_tasks: deploy_dhcp.yml
   loop:
