@@ -10,6 +10,7 @@
     - "{{ kea_container_base_dir }}/config"
     - "{{ kea_container_base_dir }}/leases"
     - "{{ kea_container_base_dir }}/logs"
+    - "{{ kea_container_base_dir }}/sockets"
     - "{{ kea_container_base_dir }}/entrypoint.d"
 
 - name: Set specific permissions for sockets directory
