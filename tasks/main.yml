@@ -2,7 +2,7 @@
   ansible.builtin.file:
     state: directory
     path: "{{ item }}"
-    mode: '0775'
+    mode: '0750'
     owner: 'root'
     group: '101'
   loop:
