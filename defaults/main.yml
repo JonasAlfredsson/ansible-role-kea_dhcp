@@ -12,17 +12,17 @@ kea_container_base_dir: "/srv/kea"
 
 # The IPv4 DHCP service
 kea_dhcp4_container_name: "kea-dhcp4"
-kea_dhcp4_container_image: "jonasal/kea-dhcp4:2"
+kea_dhcp4_container_image: "jonasal/kea-dhcp4:3"
 kea_dhcp4_container_command: "-c /kea/config/dhcp4.json"
 
 # The IPv6 DHCP service
 kea_dhcp6_container_name: "kea-dhcp6"
-kea_dhcp6_container_image: "jonasal/kea-dhcp6:2"
+kea_dhcp6_container_image: "jonasal/kea-dhcp6:3"
 kea_dhcp6_container_command: "-c /kea/config/dhcp6.json"
 
 # The Control Agent service
 kea_ctrl_agent_container_name: "kea-ctrl-agent"
-kea_ctrl_agent_container_image: "jonasal/kea-ctrl-agent:2"
+kea_ctrl_agent_container_image: "jonasal/kea-ctrl-agent:3"
 kea_ctrl_agent_container_command: "-c /kea/config/ctrl-agent.json"
 
 kea_ctrl_agent_container_use_host_network: false
