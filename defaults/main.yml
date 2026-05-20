@@ -5,31 +5,30 @@
 # Kea services that should be enabled
 kea_dhcp4_enabled: true
 kea_dhcp6_enabled: false
-kea_ctrl_agent_enabled: false
 
 # Base directory for all files
 kea_container_base_dir: "/srv/kea"
 
 # The IPv4 DHCP service
 kea_dhcp4_container_name: "kea-dhcp4"
-kea_dhcp4_container_image: "jonasal/kea-dhcp4:2"
+kea_dhcp4_container_image: "jonasal/kea-dhcp4:3"
 kea_dhcp4_container_command: "-c /kea/config/dhcp4.json"
 
 # The IPv6 DHCP service
 kea_dhcp6_container_name: "kea-dhcp6"
-kea_dhcp6_container_image: "jonasal/kea-dhcp6:2"
+kea_dhcp6_container_image: "jonasal/kea-dhcp6:3"
 kea_dhcp6_container_command: "-c /kea/config/dhcp6.json"
 
-# The Control Agent service
-kea_ctrl_agent_container_name: "kea-ctrl-agent"
-kea_ctrl_agent_container_image: "jonasal/kea-ctrl-agent:2"
-kea_ctrl_agent_container_command: "-c /kea/config/ctrl-agent.json"
-
-kea_ctrl_agent_container_use_host_network: false
-kea_ctrl_agent_container_networks:
-  - name: bridge
-kea_ctrl_agent_container_ports:
-  - "{{ kea_ctrl_agent_port }}:{{ kea_ctrl_agent_port }}"
+# The Control Socket options
+kea_dhcp_control_sockets_enabled: false
+kea_dhcp4_control_sockets:
+  - "socket-type": "http"
+    "socket-address": "127.0.0.1"
+    "socket-port": 8084 # End with "4" to indicate it's the DHCPv4 service
+kea_dhcp6_control_sockets:
+  - "socket-type": "http"
+    "socket-address": "127.0.0.1"
+    "socket-port": 8086 # End with "6" to indicate it's the DHCPv6 service
 
 
 #
@@ -75,13 +74,6 @@ kea_dhcp4_subnets: []
 kea_dhcp6_subnets: []
 
 
-#
-# Control Agent configuration
-#
-
-kea_ctrl_agent_host: "0.0.0.0"
-kea_ctrl_agent_port: 8000
-
 
 #
 # Logging
@@ -122,18 +114,6 @@ kea_logging_raw_dhcp6:
         maxsize: "{{ kea_logging_maxsize }}"
         maxver: "{{ kea_logging_maxver }}"
 
-kea_logging_raw_ctrl_agent:
-  - name: "kea-ctrl-agent"
-    severity: "{{ kea_logging_severity }}"
-    debuglevel: "{{ kea_logging_debuglevel }}"
-    output_options:
-      - output: "stdout"
-        pattern: "{{ kea_logging_pattern }}"
-      - output: "/kea/logs/ctrl-agent.log"
-        pattern: "{{ kea_logging_pattern }}"
-        maxsize: "{{ kea_logging_maxsize }}"
-        maxver: "{{ kea_logging_maxver }}"
-
 
 #
 # Raw settings
@@ -146,4 +126,3 @@ kea_logging_raw_ctrl_agent:
 # This works the same as the "kea_logging_raw_*" variables.
 kea_dhcp4_raw_options: {}
 kea_dhcp6_raw_options: {}
-kea_ctrl_agent_raw_options: {}
