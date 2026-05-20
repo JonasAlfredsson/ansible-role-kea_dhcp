@@ -4,12 +4,9 @@
             "interfaces": {{ kea_dhcp6_interfaces | to_nice_json(indent=4, ensure_ascii=False ) | indent(12, False) }}
         },
 
-{% if kea_ctrl_agent_enabled %}
-        // Create a socket which the Control Agent may use to communicate.
-        "control-socket": {
-            "socket-type": "unix",
-            "socket-name": "/kea/sockets/dhcp6.socket"
-        },
+{% if kea_dhcp_control_sockets_enabled %}
+        // Create control sockets to be able to manage the DHCP service.
+        "control-sockets": {{ kea_dhcp6_control_sockets | to_nice_json(indent=4, ensure_ascii=False ) | indent(8, False) }},
 
 {% endif %}
         // Specifies credentials to access lease database.

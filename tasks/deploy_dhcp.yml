@@ -32,4 +32,3 @@
   ansible.builtin.command: "docker kill --signal=HUP {{ outer_item.container_name }}"
   changed_when: true
   when: kea_config.changed
-  notify: Reload Kea Control Agent

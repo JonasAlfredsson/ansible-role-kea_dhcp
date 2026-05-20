@@ -1,12 +1,11 @@
 # ansible-role-kea_dhcp
 
-This Ansible role will deploy up to three Docker containers, each running one
+This Ansible role will deploy up to two Docker containers, each running one
 component of the [ISC Kea][8] DHCP server software and configure it to your
 liking. The services available are:
 
 - `kea-dhcp4`
 - `kea-dhcp6`
-- `kea-ctrl-agent`
 
 > The containers used are [`jonasal/kea-<service>`][1] from [here][2] and use
 > the `host` network [in order to function properly][7].
@@ -60,12 +59,16 @@ actually get an understanding on how each setting should be defined.
 To add some kind of structure to the example configuration I will split it into
 five sections.
 
-1. [Container Options](#container-options)
-2. [DHCP Configuration](#dhcp-configuration)
-    - [Subnets](#subnets)
-3. [Control Agent Configuration](#control-agent-configuration)
-4. [Logging](#logging)
-5. [Raw Settings](#raw-settings)
+- [ansible-role-kea\_dhcp](#ansible-role-kea_dhcp)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Example Configuration](#example-configuration)
+    - [Container Options](#container-options)
+    - [DHCP Configuration](#dhcp-configuration)
+      - [Subnets](#subnets)
+    - [Control Socket Configuration](#control-socket-configuration)
+    - [Logging](#logging)
+    - [Raw Settings](#raw-settings)
 
 All of the available settings can be viewed in the [`defaults`](./defaults/main.yml)
 file, and it is recommended to check it there before you change anything since
@@ -90,7 +93,6 @@ change the rest if you want to include them:
 ```yaml
 kea_dhcp4_enabled: true
 kea_dhcp6_enabled: false
-kea_ctrl_agent_enabled: false
 ```
 
 ### DHCP Configuration
@@ -143,17 +145,45 @@ There exists a plethora of settings here, so I suggest you look at the
 "[all-keys][5]" example and build your own configuration from that.
 
 
-### Control Agent Configuration
-There are really only two settings here that are unique for the Control Agent,
-and those are
+### Control Socket Configuration
+Since Kea 2.7 it is possible to expose the management API directly from each
+DHCP server, which means the legacy Control Agent container should no longer be
+used. Enable the [control sockets][10] and configure the address and port for
+each enabled DHCP service:
 
 ```yaml
-kea_ctrl_agent_host: "0.0.0.0"
-kea_ctrl_agent_port: 8000
+kea_dhcp_control_sockets_enabled: true
+kea_dhcp4_control_sockets:
+  - socket-type: "http"
+    socket-address: "127.0.0.1"
+    socket-port: 8084
+    authentication:
+      type: "basic"
+      clients: []  # Empty list means everyone is allowed!
+kea_dhcp6_control_sockets:
+  - socket-type: "http"
+    socket-address: "127.0.0.1"
+    socket-port: 8086
+    authentication:
+      type: "basic"
+      clients: []
 ```
 
-This will expose a RESTful API you can use to communicate with the other
-services if they are up and running.
+Use a distinct address/port pair for each service. The default configuration
+binds only to localhost; change `socket-address` deliberately before exposing
+the management API remotely. Having an empty list of `clients` means that
+anyone can send commands to Kea, which might not be desirable if exposed
+outside of `localhost`.
+
+Available commands may be found [here][11], where a very simple curl command may
+look like this:
+
+```sh
+curl -X POST -H "Content-Type: application/json" \
+    -d '{ "command": "config-get" }' \
+    http://localhost:8084/
+```
+
 
 
 ### Logging
@@ -215,3 +245,5 @@ Only the sky and your sanity is the limit here, so go wild and use the
 [7]: https://github.com/JonasAlfredsson/docker-kea#docker-network-mode
 [8]: https://kea.readthedocs.io/en/latest/arm/intro.html
 [9]: https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_advanced_syntax.html#unsafe-or-raw-strings
+[10]: https://kea.readthedocs.io/en/latest/arm/dhcp4-srv.html#dhcp4-http-ctrl-channel
+[11]: https://kea.readthedocs.io/en/latest/arm/ctrl-channel.html#commands-supported-by-both-the-dhcpv4-and-dhcpv6-servers
