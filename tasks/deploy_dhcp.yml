@@ -16,7 +16,7 @@
     image: "{{ outer_item.container_image }}"
     pull: true
     state: started
-    restart_policy: unless-stopped
+    restart_policy: "{{ kea_container_restart_policy }}"
     command: "{{ outer_item.container_command }}"
     volumes:
       - "{{ kea_container_base_dir }}/config:/kea/config:ro"

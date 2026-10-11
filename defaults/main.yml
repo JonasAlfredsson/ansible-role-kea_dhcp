@@ -6,8 +6,9 @@
 kea_dhcp4_enabled: true
 kea_dhcp6_enabled: false
 
-# Base directory for all files
+# Some base settings for all containers
 kea_container_base_dir: "/srv/kea"
+kea_container_restart_policy: "unless-stopped"
 
 # The IPv4 DHCP service
 kea_dhcp4_container_name: "kea-dhcp4"
